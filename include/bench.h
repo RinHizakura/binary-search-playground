@@ -7,6 +7,7 @@ typedef int *(*PREPARE_FUNC)(int *, int);
 typedef struct {
     PREPARE_FUNC prepare;
     LOWER_BOUND_FUNC lower_bound;
+    const char *name;
 } func_t;
 
 #endif
