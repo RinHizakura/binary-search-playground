@@ -4,7 +4,7 @@
 
 static int iters;
 
-int *eytzinger_optimized_prepare(int *src_arr, int n)
+int *eytzinger_fixed_iters_prepare(int *src_arr, int n)
 {
     // assume the multiplication never overflow
     int *arr = aligned_alloc(64, (n + 1) * sizeof(int));
@@ -16,7 +16,7 @@ int *eytzinger_optimized_prepare(int *src_arr, int n)
     return arr;
 }
 
-int eytzinger_optimized_lower_bound(int *arr, int n, int val)
+int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val)
 {
     int k = 1;
 

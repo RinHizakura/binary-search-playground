@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include "eytzinger.h"
 
-int *eytzinger_prepare(int *src_arr, int n)
+int *eytzinger_simple_prepare(int *src_arr, int n)
 {
     int *arr = calloc(n + 1, sizeof(int));
     eytzinger(src_arr, arr, 0, 1, n);
     return arr;
 }
 
-int eytzinger_lower_bound(int *arr, int n, int val)
+int eytzinger_simple_lower_bound(int *arr, int n, int val)
 {
     int k = 1;
     while (k <= n)

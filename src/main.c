@@ -15,14 +15,14 @@ int branchless_lower_bound(int *arr, int n, int val);
 int *prefetch_prepare(int *src_arr, int n);
 int prefetch_lower_bound(int *arr, int n, int val);
 
-int *eytzinger_prepare(int *src_arr, int n);
-int eytzinger_lower_bound(int *arr, int n, int val);
+int *eytzinger_simple_prepare(int *src_arr, int n);
+int eytzinger_simple_lower_bound(int *arr, int n, int val);
 
 int *eytzinger_prefetch_prepare(int *src_arr, int n);
 int eytzinger_prefetch_lower_bound(int *arr, int n, int val);
 
-int *eytzinger_optimized_prepare(int *src_arr, int n);
-int eytzinger_optimized_lower_bound(int *arr, int n, int val);
+int *eytzinger_fixed_iters_prepare(int *src_arr, int n);
+int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val);
 
 static int cmp(const void *a, const void *b)
 {
@@ -89,11 +89,12 @@ int main(int argc, char *argv[])
         {baseline_prepare, baseline_lower_bound, "baseline"},
         {branchless_prepare, branchless_lower_bound, "branchless"},
         {prefetch_prepare, prefetch_lower_bound, "prefetch"},
-        {eytzinger_prepare, eytzinger_lower_bound, "eytzinger"},
+        {eytzinger_simple_prepare, eytzinger_simple_lower_bound,
+         "eytzinger_simple"},
         {eytzinger_prefetch_prepare, eytzinger_prefetch_lower_bound,
          "eytzinger_prefetch"},
-        {eytzinger_optimized_prepare, eytzinger_optimized_lower_bound,
-         "eytzinger_optimized"},
+        {eytzinger_fixed_iters_prepare, eytzinger_fixed_iters_lower_bound,
+         "eytzinger_fixed_iters"},
     };
 
     for (int i = 0; i < 6; i++) {
