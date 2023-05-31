@@ -1,18 +1,9 @@
-#include <stdlib.h>
-#include "eytzinger_base.h"
-
-int *eytzinger_prepare(int *src_arr, int n)
+int eytzinger(int *src_arr, int *arr, int i, int k, int n)
 {
-    int *arr = calloc(n + 1, sizeof(int));
-    eytzinger(src_arr, arr, 0, 1, n);
-    return arr;
-}
-
-int eytzinger_lower_bound(int *arr, int n, int val)
-{
-    int k = 1;
-    while (k <= n)
-        k = 2 * k + (arr[k] < val);
-    k >>= __builtin_ffs(~k);
-    return arr[k];
+    if (k <= n) {
+        i = eytzinger(src_arr, arr, i, 2 * k, n);
+        arr[k] = src_arr[i++];
+        i = eytzinger(src_arr, arr, i, 2 * k + 1, n);
+    }
+    return i;
 }

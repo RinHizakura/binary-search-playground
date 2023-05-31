@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "eytzinger_base.h"
+#include "eytzinger.h"
 
 int *eytzinger_prefetch_prepare(int *src_arr, int n)
 {
