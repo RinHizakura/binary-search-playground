@@ -24,6 +24,9 @@ int eytzinger_prefetch_lower_bound(int *arr, int n, int val);
 int *eytzinger_fixed_iters_prepare(int *src_arr, int n);
 int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val);
 
+int *b_tree_prepare(int *src_arr, int n);
+int b_tree_lower_bound(int *arr, int n, int val);
+
 static int cmp(const void *a, const void *b)
 {
     return *(int *) a - *(int *) b;
@@ -95,9 +98,10 @@ int main(int argc, char *argv[])
          "eytzinger_prefetch"},
         {eytzinger_fixed_iters_prepare, eytzinger_fixed_iters_lower_bound,
          "eytzinger_fixed_iters"},
+        {b_tree_prepare, b_tree_lower_bound, "B-tree"},
     };
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 7; i++) {
         bool result = bench(src_arr, sz, f[i].prepare, f[i].lower_bound);
         printf("The result of %s is %s\n", f[i].name,
                result ? "TRUE" : "FALSE");
