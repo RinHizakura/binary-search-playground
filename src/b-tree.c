@@ -4,6 +4,7 @@
 
 const int B = 16;
 static int nblocks;
+static int max;
 
 #define KEY(btree, k, i) btree[k * B + i]
 
@@ -19,7 +20,7 @@ static void build(int *src_arr, int *btree, int k, int n)
     if (k < nblocks) {
         for (int i = 0; i < B; i++) {
             build(src_arr, btree, go(k, i), n);
-            KEY(btree, k, i) = (t < n ? src_arr[t++] : INT_MAX);
+            KEY(btree, k, i) = (t < n ? src_arr[t++] : max);
         }
         build(src_arr, btree, go(k, B), n);
     }
@@ -27,6 +28,7 @@ static void build(int *src_arr, int *btree, int k, int n)
 
 int *b_tree_prepare(int *src_arr, int n)
 {
+    max = src_arr[n - 1];
     nblocks = ALIGN_UP(n, B);
     /* This is actually a two dimensional array (int btree[nblocks][B]),
      * but we allocate as a one dimensional array to make sure that we free
@@ -54,7 +56,10 @@ static int cmp(int *btree, int k, int val)
 
 int b_tree_lower_bound(int *btree, int n, int val)
 {
-    int k = 0, res = INT_MAX;
+    if (max < val)
+        return -1;
+
+    int k = 0, res = max;
     while (k < nblocks) {
         int cmp_mask = cmp(btree, k, val);
         int i = __builtin_ffs(cmp_mask) - 1;

@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "bench.h"
@@ -14,6 +15,9 @@ int branchless_lower_bound(int *arr, int n, int val);
 
 int *prefetch_prepare(int *src_arr, int n);
 int prefetch_lower_bound(int *arr, int n, int val);
+
+int *shar_prepare(int *src_arr, int n);
+int shar_lower_bound(int *arr, int n, int val);
 
 int *eytzinger_simple_prepare(int *src_arr, int n);
 int eytzinger_simple_lower_bound(int *arr, int n, int val);
@@ -64,7 +68,7 @@ static bool bench(int *src_arr,
         // Use the result of baseline binary search as correct answer
         int expect = baseline_lower_bound(src_arr, n, val);
         if (expect != ans) {
-            printf("%d != %d\n", expect, ans);
+            printf("Key = %d: %d != %d\n", val, expect, ans);
             result = false;
         }
 #endif
@@ -83,15 +87,20 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    // ALSR
+    srand((uintptr_t) &argc);
+
     size_t sz = 0;
     sscanf(argv[1], "%ld", &sz);
 
     int *src_arr = generate_input(sz);
+    printf("min = %d, max = %d\n", src_arr[0], src_arr[sz - 1]);
 
     func_t f[] = {
         {baseline_prepare, baseline_lower_bound, "baseline"},
         {branchless_prepare, branchless_lower_bound, "branchless"},
         {prefetch_prepare, prefetch_lower_bound, "prefetch"},
+        {shar_prepare, shar_lower_bound, "shar"},
         {eytzinger_simple_prepare, eytzinger_simple_lower_bound,
          "eytzinger_simple"},
         {eytzinger_prefetch_prepare, eytzinger_prefetch_lower_bound,
@@ -101,7 +110,7 @@ int main(int argc, char *argv[])
         {b_tree_prepare, b_tree_lower_bound, "B-tree"},
     };
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
         bool result = bench(src_arr, sz, f[i].prepare, f[i].lower_bound);
         printf("The result of %s is %s\n", f[i].name,
                result ? "TRUE" : "FALSE");

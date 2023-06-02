@@ -3,16 +3,17 @@
 #include "eytzinger.h"
 
 static int iters;
+static int max;
 
 int *eytzinger_fixed_iters_prepare(int *src_arr, int n)
 {
     // assume the multiplication never overflow
     int *arr = aligned_alloc(64, (n + 1) * sizeof(int));
     eytzinger(src_arr, arr, 0, 1, n);
-
-    // an element that is less than x
     arr[0] = -1;
+
     iters = log2(n + 1);
+    max = arr[n - 1];
     return arr;
 }
 

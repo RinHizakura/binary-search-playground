@@ -8,6 +8,9 @@ int *prefetch_prepare(int *src_arr, int n)
 
 int prefetch_lower_bound(int *arr, int n, int val)
 {
+    if (arr[n - 1] < val)
+        return -1;
+
     int *base = arr, len = n;
     while (len > 1) {
         int half = len / 2;
