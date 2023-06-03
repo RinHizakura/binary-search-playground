@@ -1,4 +1,4 @@
-CFLAGS = -Iinclude
+CFLAGS = -Iinclude -mavx -mavx2
 LDFLAGS = -lm
 
 CURDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))

@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "common.h"
 
+//#ifdef __AVX2__
+#include <immintrin.h>
+//#endif
+
 const int B = 16;
 static int nblocks;
 static int max;
@@ -41,16 +45,29 @@ int *b_tree_prepare(int *src_arr, int n)
 }
 
 /* This function compare each key in the target node k, and
- * set the corresponing bit if the key >= val.
- *
- * TODO: These can be implemented by SIMD instruction */
+ * set the corresponing bit if the key >= val. */
 static int cmp(int *btree, int k, int val)
 {
-    int mask = (1 << B);
+    int mask;
+#ifdef __AVX2__
+    __m256i x_vec, y_vec, mask_vec;
+
+    x_vec = _mm256_set1_epi32(val);
+    y_vec = _mm256_load_si256((__m256i *) &KEY(btree, k, 0));
+    mask_vec = _mm256_cmpgt_epi32(x_vec, y_vec);
+    int lower = _mm256_movemask_ps((__m256) mask_vec);
+
+    y_vec = _mm256_load_si256((__m256i *) &KEY(btree, k, 8));
+    mask_vec = _mm256_cmpgt_epi32(x_vec, y_vec);
+    int upper = _mm256_movemask_ps((__m256) mask_vec);
+
+    mask = ~(lower | upper << 8);
+#else
+    mask = (1 << B);
 
     for (int i = 0; i < B; i++)
         mask |= (KEY(btree, k, i) >= val) << i;
-
+#endif
     return mask;
 }
 
