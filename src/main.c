@@ -28,8 +28,11 @@ int eytzinger_prefetch_lower_bound(int *arr, int n, int val);
 int *eytzinger_fixed_iters_prepare(int *src_arr, int n);
 int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val);
 
-int *b_tree_prepare(int *src_arr, int n);
-int b_tree_lower_bound(int *arr, int n, int val);
+int *b_tree_simple_prepare(int *src_arr, int n);
+int b_tree_simple_lower_bound(int *arr, int n, int val);
+
+int *b_tree_optimized_prepare(int *src_arr, int n);
+int b_tree_optimized_lower_bound(int *arr, int n, int val);
 
 static int cmp(const void *a, const void *b)
 {
@@ -107,10 +110,12 @@ int main(int argc, char *argv[])
          "eytzinger_prefetch"},
         {eytzinger_fixed_iters_prepare, eytzinger_fixed_iters_lower_bound,
          "eytzinger_fixed_iters"},
-        {b_tree_prepare, b_tree_lower_bound, "B-tree"},
+        {b_tree_simple_prepare, b_tree_simple_lower_bound, "B-tree_simple"},
+        {b_tree_optimized_prepare, b_tree_optimized_lower_bound,
+         "B-tree_optimized"},
     };
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         bool result = bench(src_arr, sz, f[i].prepare, f[i].lower_bound);
         printf("The result of %s is %s\n", f[i].name,
                result ? "TRUE" : "FALSE");

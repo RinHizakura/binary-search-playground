@@ -1,22 +1,14 @@
 #include <limits.h>
 #include <stdlib.h>
+#include "b-tree.h"
 #include "common.h"
 
-//#ifdef __AVX2__
+#ifdef __AVX2__
 #include <immintrin.h>
-//#endif
+#endif
 
-const int B = 16;
 static int nblocks;
 static int max;
-
-#define KEY(btree, k, i) btree[k * B + i]
-
-// Get the node index for the child i of node k
-static inline int go(int k, int i)
-{
-    return k * (B + 1) + i + 1;
-}
 
 static void build(int *src_arr, int *btree, int k, int n)
 {
@@ -30,10 +22,10 @@ static void build(int *src_arr, int *btree, int k, int n)
     }
 }
 
-int *b_tree_prepare(int *src_arr, int n)
+int *b_tree_simple_prepare(int *src_arr, int n)
 {
     max = src_arr[n - 1];
-    nblocks = ALIGN_UP(n, B);
+    nblocks = ALIGN_UP(n, B) / B;
     /* This is actually a two dimensional array (int btree[nblocks][B]),
      * but we allocate as a one dimensional array to make sure that we free
      * the space correctly in the bench function. */
@@ -71,7 +63,7 @@ static int cmp(int *btree, int k, int val)
     return mask;
 }
 
-int b_tree_lower_bound(int *btree, int n, int val)
+int b_tree_simple_lower_bound(int *btree, int n, int val)
 {
     if (max < val)
         return -1;
