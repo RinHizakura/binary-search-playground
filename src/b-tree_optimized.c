@@ -9,9 +9,6 @@
 
 #define HUGE_PAGESIZE (1 << 21)
 
-const int translate[16] = {0, 1, 2, 3, 8,  9,  10, 11,
-                           4, 5, 6, 7, 12, 13, 14, 15};
-
 static int H;
 static int nblocks;
 static int max;
@@ -45,7 +42,6 @@ static void permute(int *node)
     _mm256_storeu_si256(middle, x);
 }
 
-#include <stdio.h>
 static void build(int *src_arr, int *btree, int k, int n)
 {
     static int t = 0;
@@ -93,6 +89,8 @@ static int rank(int *btree, int k, __m256i x_vec)
     return __builtin_ctz(mask) >> 1;
 }
 
+const int translate[16] = {0, 1, 2, 3, 8,  9,  10, 11,
+                           4, 5, 6, 7, 12, 13, 14, 15};
 static int update(int res, int *btree, int k, int i)
 {
     if (i >= B) {
