@@ -34,6 +34,9 @@ int b_tree_simple_lower_bound(int *arr, int n, int val);
 int *b_tree_optimized_prepare(int *src_arr, int n);
 int b_tree_optimized_lower_bound(int *arr, int n, int val);
 
+int *b_plus_tree_prepare(int *src_arr, int n);
+int b_plus_tree_lower_bound(int *btree, int n, int val);
+
 static int cmp(const void *a, const void *b)
 {
     return *(int *) a - *(int *) b;
@@ -113,9 +116,10 @@ int main(int argc, char *argv[])
         {b_tree_simple_prepare, b_tree_simple_lower_bound, "B-tree_simple"},
         {b_tree_optimized_prepare, b_tree_optimized_lower_bound,
          "B-tree_optimized"},
+        {b_plus_tree_prepare, b_plus_tree_lower_bound, "B+tree"},
     };
 
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 10; i++) {
         bool result = bench(src_arr, sz, f[i].prepare, f[i].lower_bound);
         printf("The result of %s is %s\n", f[i].name,
                result ? "TRUE" : "FALSE");
