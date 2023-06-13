@@ -15,8 +15,6 @@ static int S;
 
 #define BLOCKS(n) (ALIGN_UP(n, B) / B)
 
-#include <stdio.h>
-
 /* For n key values, count the number of keys on the previous
  * layer. The calculation comes from the fact that for a group
  * of B + 1 child node, one node with B keys will be needed. */
