@@ -13,14 +13,14 @@ static int max;
 static int H;
 static int S;
 
-#define BLOCKS(n) (ALIGN_UP(n, B) / B)
+#define BLOCKS(n) DIV_UP(n, B)
 
 /* For n key values, count the number of keys on the previous
  * layer. The calculation comes from the fact that for a group
  * of B + 1 child node, one node with B keys will be needed. */
 static int prev_keys(int n)
 {
-    return (BLOCKS(n) + B) / (B + 1) * B;
+    return DIV_UP(BLOCKS(n), B + 1) * B;
 }
 
 static int height(int n)

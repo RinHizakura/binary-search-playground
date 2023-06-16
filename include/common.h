@@ -5,4 +5,6 @@
 #define __ALIGN_MASK(x, mask) (((x) + (mask)) & ~(mask))
 #define ALIGN_UP(x, a) __ALIGN((x), (a))
 
+#define DIV_UP(n, d) (((n) + (d) -1) / (d))
+
 #endif
