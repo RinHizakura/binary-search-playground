@@ -85,7 +85,7 @@ static int rank(int *btree, int k, __m256i x_vec)
 
     // we need to divide the result by two because we call movemask_epi8 on
     // 16-bit masks:
-    return __builtin_ctz(mask) >> 1;
+    return mask == 0 ? B : __builtin_ctz(mask) >> 1;
 }
 
 const int translate[16] = {0, 1, 2, 3, 8,  9,  10, 11,
