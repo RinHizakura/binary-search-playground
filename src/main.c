@@ -6,36 +6,6 @@
 
 #include "bench.h"
 
-int *baseline_prepare(int *src_arr, int n);
-int baseline_lower_bound(int *arr, int n, int val);
-
-int *branchless_prepare(int *src_arr, int n);
-int branchless_lower_bound(int *arr, int n, int val);
-
-int *prefetch_prepare(int *src_arr, int n);
-int prefetch_lower_bound(int *arr, int n, int val);
-
-int *shar_prepare(int *src_arr, int n);
-int shar_lower_bound(int *arr, int n, int val);
-
-int *eytzinger_simple_prepare(int *src_arr, int n);
-int eytzinger_simple_lower_bound(int *arr, int n, int val);
-
-int *eytzinger_prefetch_prepare(int *src_arr, int n);
-int eytzinger_prefetch_lower_bound(int *arr, int n, int val);
-
-int *eytzinger_fixed_iters_prepare(int *src_arr, int n);
-int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val);
-
-int *b_tree_simple_prepare(int *src_arr, int n);
-int b_tree_simple_lower_bound(int *arr, int n, int val);
-
-int *b_tree_optimized_prepare(int *src_arr, int n);
-int b_tree_optimized_lower_bound(int *arr, int n, int val);
-
-int *b_plus_tree_prepare(int *src_arr, int n);
-int b_plus_tree_lower_bound(int *btree, int n, int val);
-
 static int cmp(const void *a, const void *b)
 {
     return *(int *) a - *(int *) b;
@@ -100,73 +70,27 @@ static long bench(int *src_arr,
     return time;
 }
 
-#define BASELINE 0
-#define BRANCHLESS 1
-#define PREFETCH 2
-#define SHAR 3
-#define EYTZINGER_SIMPLE 4
-#define EYTZINGER_PREFETCH 5
-#define EYTZINGER_FIXED_ITERS 6
-#define BTREE_SIMPLE 7
-#define BTREE_OPT 8
-#define B_PLUS 9
 #define TOTAL 10
 
-const func_t baseline_f = {
-    .prepare = baseline_prepare,
-    .lower_bound = baseline_lower_bound,
-    .name = "baseline",
-};
+#define DECLARE_FUNC(f_sig)                            \
+    int *f_sig##_prepare(int *src_arr, int n);         \
+    int f_sig##_lower_bound(int *arr, int n, int val); \
+    const func_t f_sig##_f = {                         \
+        .prepare = f_sig##_prepare,                    \
+        .lower_bound = f_sig##_lower_bound,            \
+        .name = #f_sig,                                \
+    };
 
-const func_t branchless_f = {
-    .prepare = branchless_prepare,
-    .lower_bound = branchless_lower_bound,
-    .name = "branchless",
-};
-
-const func_t prefetch_f = {
-    .prepare = prefetch_prepare,
-    .lower_bound = prefetch_lower_bound,
-    .name = "prefetch",
-};
-
-const func_t shar_f = {
-    .prepare = shar_prepare,
-    .lower_bound = shar_lower_bound,
-    .name = "shar",
-};
-
-const func_t eytzinger_simple_f = {
-    .prepare = eytzinger_simple_prepare,
-    .lower_bound = eytzinger_simple_lower_bound,
-    .name = "eytzinger_simple",
-};
-
-const func_t eytzinger_prefetch_f = {
-    .prepare = eytzinger_prefetch_prepare,
-    .lower_bound = eytzinger_prefetch_lower_bound,
-    .name = "eytzinger_prefetch",
-};
-
-const func_t eytzinger_fixed_iters_f = {
-    .prepare = eytzinger_fixed_iters_prepare,
-    .lower_bound = eytzinger_fixed_iters_lower_bound,
-    .name = "eytzinger_fixed_iters",
-};
-
-const func_t b_tree_simple_f = {.prepare = b_tree_simple_prepare,
-                                .lower_bound = b_tree_simple_lower_bound,
-                                .name = "B-tree_simple"};
-
-const func_t b_tree_optimized_f = {
-    .prepare = b_tree_optimized_prepare,
-    .lower_bound = b_tree_optimized_lower_bound,
-    .name = "B-tree_optimized",
-};
-
-const func_t b_plus_tree_f = {.prepare = b_plus_tree_prepare,
-                              .lower_bound = b_plus_tree_lower_bound,
-                              .name = "B+tree"};
+DECLARE_FUNC(baseline);
+DECLARE_FUNC(branchless);
+DECLARE_FUNC(prefetch);
+DECLARE_FUNC(shar);
+DECLARE_FUNC(eytzinger_simple);
+DECLARE_FUNC(eytzinger_prefetch);
+DECLARE_FUNC(eytzinger_fixed_iters);
+DECLARE_FUNC(b_tree_simple);
+DECLARE_FUNC(b_tree_optimized);
+DECLARE_FUNC(b_plus_tree);
 
 const func_t f[TOTAL] = {
     baseline_f,
