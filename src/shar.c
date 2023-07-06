@@ -2,7 +2,7 @@
 
 int *shar_prepare(int *src_arr, int n)
 {
-    return NULL;
+    return src_arr;
 }
 
 int shar_lower_bound(int *arr, int n, int val)

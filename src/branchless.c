@@ -3,7 +3,7 @@
 int *branchless_prepare(int *src_arr, int n)
 {
     // do nothing, we don't need any preparation in this algorithm
-    return NULL;
+    return src_arr;
 }
 
 int branchless_lower_bound(int *arr, int n, int val)

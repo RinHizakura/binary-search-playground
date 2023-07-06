@@ -78,3 +78,10 @@ int b_tree_simple_lower_bound(int *btree, int n, int val)
     }
     return res;
 }
+
+void b_tree_simple_clean(int *btree)
+{
+    if (btree) {
+        free(btree);
+    }
+}

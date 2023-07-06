@@ -27,3 +27,10 @@ int eytzinger_prefetch_lower_bound(int *arr, int n, int val)
     k >>= __builtin_ffs(~k);
     return arr[k];
 }
+
+void eytzinger_prefetch_clean(int *arr)
+{
+    if (arr) {
+        free(arr);
+    }
+}

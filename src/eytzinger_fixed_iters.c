@@ -31,3 +31,10 @@ int eytzinger_fixed_iters_lower_bound(int *arr, int n, int val)
 
     return arr[k];
 }
+
+void eytzinger_fixed_iters_clean(int *arr)
+{
+    if (arr) {
+        free(arr);
+    }
+}

@@ -3,7 +3,7 @@
 int *prefetch_prepare(int *src_arr, int n)
 {
     // do nothing, we don't need any preparation in this algorithm
-    return NULL;
+    return src_arr;
 }
 
 int prefetch_lower_bound(int *arr, int n, int val)

@@ -141,3 +141,10 @@ int b_plus_tree_lower_bound(int *btree, int n, int val)
     int i = direct_rank(btree, k, x_vec);
     return btree[k + i];
 }
+
+void b_plus_tree_clean(int *btree)
+{
+    if (btree) {
+        free(btree);
+    }
+}

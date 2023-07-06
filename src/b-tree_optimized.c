@@ -64,7 +64,6 @@ int *b_tree_optimized_prepare(int *src_arr, int n)
     int sz = ALIGN_UP(nblocks * B * sizeof(int), HUGE_PAGESIZE);
     int *btree = aligned_alloc(HUGE_PAGESIZE, sz);
     madvise(btree, sz, MADV_HUGEPAGE);
-
     build(src_arr, btree, 0, n);
 
     return btree;
@@ -96,7 +95,6 @@ static int update(int res, int *btree, int k, int i)
     if (i >= B) {
         return res;
     }
-
     return KEY(btree, k, translate[i]);
 }
 
@@ -118,4 +116,11 @@ int b_tree_optimized_lower_bound(int *btree, int n, int val)
         res = update(res, btree, k, i);
     }
     return res;
+}
+
+void b_tree_optimized_clean(int *btree)
+{
+    if (btree) {
+        free(btree);
+    }
 }

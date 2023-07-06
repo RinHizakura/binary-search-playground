@@ -6,6 +6,48 @@
 
 #include "bench.h"
 
+#define TOTAL 10
+
+#define __DECLARE_FUNC(f_sig, clean_f)                 \
+    int *f_sig##_prepare(int *src_arr, int n);         \
+    int f_sig##_lower_bound(int *arr, int n, int val); \
+    const func_t f_sig##_f = {                         \
+        .prepare = f_sig##_prepare,                    \
+        .lower_bound = f_sig##_lower_bound,            \
+        .clean = clean_f,                              \
+        .name = #f_sig,                                \
+    };
+
+#define DECLARE_FUNC(f_sig) __DECLARE_FUNC(f_sig, NULL)
+
+#define DECLARE_FUNC_WITH_CLEAN(f_sig) \
+    void f_sig##_clean(int *arr);      \
+    __DECLARE_FUNC(f_sig, f_sig##_clean)
+
+DECLARE_FUNC(baseline);
+DECLARE_FUNC(branchless);
+DECLARE_FUNC(prefetch);
+DECLARE_FUNC(shar);
+DECLARE_FUNC_WITH_CLEAN(eytzinger_simple);
+DECLARE_FUNC_WITH_CLEAN(eytzinger_prefetch);
+DECLARE_FUNC_WITH_CLEAN(eytzinger_fixed_iters);
+DECLARE_FUNC_WITH_CLEAN(b_tree_simple);
+DECLARE_FUNC_WITH_CLEAN(b_tree_optimized);
+DECLARE_FUNC_WITH_CLEAN(b_plus_tree);
+
+const func_t f[TOTAL] = {
+    baseline_f,
+    branchless_f,
+    prefetch_f,
+    shar_f,
+    eytzinger_simple_f,
+    eytzinger_prefetch_f,
+    eytzinger_fixed_iters_f,
+    b_tree_simple_f,
+    b_tree_optimized_f,
+    b_plus_tree_f,
+};
+
 static int cmp(const void *a, const void *b)
 {
     return *(int *) a - *(int *) b;
@@ -37,15 +79,10 @@ static long bench(int *src_arr,
                   int n,
                   int m,
                   PREPARE_FUNC prepare,
-                  LOWER_BOUND_FUNC lower_bound)
+                  LOWER_BOUND_FUNC lower_bound,
+                  CLEAN_FUNC clean)
 {
-    int *ret = prepare(src_arr, n);
-
-    int *arr;
-    if (ret == NULL)
-        arr = src_arr;
-    else
-        arr = ret;
+    int *arr = prepare(src_arr, n);
 
     struct timespec tt1, tt2;
     clock_gettime(CLOCK_MONOTONIC, &tt1);
@@ -64,46 +101,11 @@ static long bench(int *src_arr,
     long time = (long long) (tt2.tv_sec * 1e9 + tt2.tv_nsec) -
                 (long long) (tt1.tv_sec * 1e9 + tt1.tv_nsec);
 
-    if (ret != NULL)
-        free(arr);
+    if (clean != NULL)
+        clean(arr);
 
     return time;
 }
-
-#define TOTAL 10
-
-#define DECLARE_FUNC(f_sig)                            \
-    int *f_sig##_prepare(int *src_arr, int n);         \
-    int f_sig##_lower_bound(int *arr, int n, int val); \
-    const func_t f_sig##_f = {                         \
-        .prepare = f_sig##_prepare,                    \
-        .lower_bound = f_sig##_lower_bound,            \
-        .name = #f_sig,                                \
-    };
-
-DECLARE_FUNC(baseline);
-DECLARE_FUNC(branchless);
-DECLARE_FUNC(prefetch);
-DECLARE_FUNC(shar);
-DECLARE_FUNC(eytzinger_simple);
-DECLARE_FUNC(eytzinger_prefetch);
-DECLARE_FUNC(eytzinger_fixed_iters);
-DECLARE_FUNC(b_tree_simple);
-DECLARE_FUNC(b_tree_optimized);
-DECLARE_FUNC(b_plus_tree);
-
-const func_t f[TOTAL] = {
-    baseline_f,
-    branchless_f,
-    prefetch_f,
-    shar_f,
-    eytzinger_simple_f,
-    eytzinger_prefetch_f,
-    eytzinger_fixed_iters_f,
-    b_tree_simple_f,
-    b_tree_optimized_f,
-    b_plus_tree_f,
-};
 
 int main(int argc, char *argv[])
 {
@@ -124,10 +126,16 @@ int main(int argc, char *argv[])
     int *query_arr = generate_query(m);
 
     for (int i = 0; i < TOTAL; i++) {
-        long time =
-            bench(src_arr, query_arr, n, m, f[i].prepare, f[i].lower_bound);
-        printf("The result of %-25s is %ld(ns)\n", f[i].name, time);
+        printf("%s, ", f[i].name);
     }
+    puts("");
+
+    for (int i = 0; i < TOTAL; i++) {
+        long time = bench(src_arr, query_arr, n, m, f[i].prepare,
+                          f[i].lower_bound, f[i].clean);
+        printf("%ld, ", time);
+    }
+    puts("");
 
     free(src_arr);
     free(query_arr);
