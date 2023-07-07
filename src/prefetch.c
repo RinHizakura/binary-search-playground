@@ -21,3 +21,5 @@ int prefetch_lower_bound(int *arr, int n, int val)
     }
     return *base;
 }
+
+void prefetch_clean(int *src_arr) {}

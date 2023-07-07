@@ -20,3 +20,5 @@ int branchless_lower_bound(int *arr, int n, int val)
     }
     return *base;
 }
+
+void branchless_clean(int *src_arr) {}

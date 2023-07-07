@@ -8,32 +8,27 @@
 
 #define TOTAL 10
 
-#define __DECLARE_FUNC(f_sig, clean_f)                 \
+#define DECLARE_FUNC(f_sig)                            \
     int *f_sig##_prepare(int *src_arr, int n);         \
     int f_sig##_lower_bound(int *arr, int n, int val); \
+    void f_sig##_clean(int *arr);                      \
     const func_t f_sig##_f = {                         \
         .prepare = f_sig##_prepare,                    \
         .lower_bound = f_sig##_lower_bound,            \
-        .clean = clean_f,                              \
+        .clean = f_sig##_clean,                        \
         .name = #f_sig,                                \
     };
-
-#define DECLARE_FUNC(f_sig) __DECLARE_FUNC(f_sig, NULL)
-
-#define DECLARE_FUNC_WITH_CLEAN(f_sig) \
-    void f_sig##_clean(int *arr);      \
-    __DECLARE_FUNC(f_sig, f_sig##_clean)
 
 DECLARE_FUNC(baseline);
 DECLARE_FUNC(branchless);
 DECLARE_FUNC(prefetch);
 DECLARE_FUNC(shar);
-DECLARE_FUNC_WITH_CLEAN(eytzinger_simple);
-DECLARE_FUNC_WITH_CLEAN(eytzinger_prefetch);
-DECLARE_FUNC_WITH_CLEAN(eytzinger_fixed_iters);
-DECLARE_FUNC_WITH_CLEAN(b_tree_simple);
-DECLARE_FUNC_WITH_CLEAN(b_tree_optimized);
-DECLARE_FUNC_WITH_CLEAN(b_plus_tree);
+DECLARE_FUNC(eytzinger_simple);
+DECLARE_FUNC(eytzinger_prefetch);
+DECLARE_FUNC(eytzinger_fixed_iters);
+DECLARE_FUNC(b_tree_simple);
+DECLARE_FUNC(b_tree_optimized);
+DECLARE_FUNC(b_plus_tree);
 
 const func_t f[TOTAL] = {
     baseline_f,
@@ -74,20 +69,14 @@ static int *generate_query(size_t sz)
     return src_arr;
 }
 
-static long bench(int *src_arr,
-                  int *query_arr,
-                  int n,
-                  int m,
-                  PREPARE_FUNC prepare,
-                  LOWER_BOUND_FUNC lower_bound,
-                  CLEAN_FUNC clean)
+static long bench(int *src_arr, int *query_arr, int n, int m, const func_t *f)
 {
-    int *arr = prepare(src_arr, n);
+    int *arr = f->prepare(src_arr, n);
 
     struct timespec tt1, tt2;
     clock_gettime(CLOCK_MONOTONIC, &tt1);
     for (int i = 0; i < m; i++) {
-        int ans = lower_bound(arr, n, query_arr[i]);
+        int ans = f->lower_bound(arr, n, query_arr[i]);
 #ifdef CHECK_CORRECTNESS
         // Use the result of baseline binary search as correct answer
         int expect = baseline_lower_bound(src_arr, n, query_arr[i]);
@@ -101,8 +90,7 @@ static long bench(int *src_arr,
     long time = (long long) (tt2.tv_sec * 1e9 + tt2.tv_nsec) -
                 (long long) (tt1.tv_sec * 1e9 + tt1.tv_nsec);
 
-    if (clean != NULL)
-        clean(arr);
+    f->clean(arr);
 
     return time;
 }
@@ -131,8 +119,7 @@ int main(int argc, char *argv[])
     puts("");
 
     for (int i = 0; i < TOTAL; i++) {
-        long time = bench(src_arr, query_arr, n, m, f[i].prepare,
-                          f[i].lower_bound, f[i].clean);
+        long time = bench(src_arr, query_arr, n, m, &f[i]);
         printf("%ld, ", time);
     }
     puts("");

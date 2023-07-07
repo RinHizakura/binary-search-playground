@@ -22,3 +22,5 @@ int baseline_lower_bound(int *arr, int n, int val)
     }
     return arr[l];
 }
+
+void baseline_clean(int *src_arr) {}
