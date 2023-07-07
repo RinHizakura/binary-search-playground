@@ -12,6 +12,7 @@
 static int max;
 static int H;
 static int S;
+static int *offset;
 
 #define BLOCKS(n) DIV_UP(n, B)
 
@@ -30,7 +31,7 @@ static int height(int n)
 
 /* For the tree with n keys, get the offset set of the starts
  * oflayer h starts (layer 0 is the largest and the leaf node) */
-static int offset(int n, int h)
+static int get_offset(int n, int h)
 {
     int k = 0;
     while (h--) {
@@ -56,8 +57,15 @@ int *b_plus_tree_prepare(int *src_arr, int n)
     /* This must be initialized first because we'll use
      * it for prepare later. */
     H = height(n);
+
+    /* Construct the table to get the offset of each height faster */
+    offset = malloc((H + 1) * sizeof(int));
+    for (int h = 0; h <= H; h++) {
+        offset[h] = get_offset(n, h);
+    }
+
     // The size of tree will equal to the start offset of (non-existent) layer H
-    S = offset(n, H);
+    S = offset[H];
 
     int sz = ALIGN_UP(sizeof(int) * S, HUGE_PAGESIZE);
     int *btree = aligned_alloc(HUGE_PAGESIZE, sz);
@@ -69,8 +77,8 @@ int *b_plus_tree_prepare(int *src_arr, int n)
 
     /* Construct the tree layer by layer */
     for (int h = 1; h < H; h++) {
-        int offset_cur = offset(n, h);
-        int offset_range = offset(n, h + 1) - offset_cur;
+        int offset_cur = offset[h];
+        int offset_range = offset[h + 1] - offset_cur;
         for (int i = 0; i < offset_range; i++) {
             /* k is the index of node */
             int k = i / B;
@@ -89,7 +97,7 @@ int *b_plus_tree_prepare(int *src_arr, int n)
     }
 
     // Don't permute layer 0 to avoid index translation on it
-    for (int i = offset(n, 1); i < S; i += B)
+    for (int i = offset[1]; i < S; i += B)
         permute(btree + i);
 
     return btree;
@@ -134,7 +142,7 @@ int b_plus_tree_lower_bound(int *btree, int n, int val)
     __m256i x_vec = _mm256_set1_epi32(val - 1);
 
     for (int h = H - 1; h > 0; h--) {
-        int i = permuted_rank(btree, offset(n, h) + k, x_vec);
+        int i = permuted_rank(btree, offset[h] + k, x_vec);
 
         k = k * (B + 1) + i * B;
     }
@@ -146,5 +154,10 @@ void b_plus_tree_clean(int *btree)
 {
     if (btree) {
         free(btree);
+    }
+
+    if (offset) {
+        free(offset);
+        offset = NULL;
     }
 }
