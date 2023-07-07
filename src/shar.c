@@ -14,9 +14,6 @@ int shar_lower_bound(int *arr, int n, int val)
     if (arr[0] > val)
         return arr[0];
 
-    if (n == 1)
-        return (arr[0] <= val) ? arr[0] : -1;
-
     // assume n won't be 0
     int u = 32 - __builtin_clz(2 * n - 1) - 2;
     // Let p being 2^floor(lgn)
@@ -29,7 +26,8 @@ int shar_lower_bound(int *arr, int n, int val)
             i += p;
     }
 
-    return arr[i + 1];
+    // Find answer from i or i+1, any better approach for this?
+    return arr[i] >= val ? arr[i] : arr[i + 1];
 }
 
 void shar_clean(int *src_arr) {}

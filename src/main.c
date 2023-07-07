@@ -113,6 +113,8 @@ int main(int argc, char *argv[])
     int *src_arr = generate_input(n);
     int *query_arr = generate_query(m);
 
+    printf("min %d max %d\n", src_arr[0], src_arr[n - 1]);
+
     for (int i = 0; i < TOTAL; i++) {
         printf("%s, ", f[i].name);
     }
